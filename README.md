@@ -1,25 +1,31 @@
+# Creative Tab Pin-Up
 
-Installation information
-=======
+Creative Tab Pin-Up is a client-side NeoForge mod for Minecraft 1.21.1 that lets you pin creative inventory tabs as persistent shortcuts.
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions provided by [GitHub](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+## Features
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
+- Pin up to 8 creative tabs without reordering or removing them from the normal creative inventory.
+- The first 4 pinned tabs appear on the left side of the creative menu and the next 4 on the right.
+- Pinned tabs stay visible from the inventory tab and from every NeoForge creative tab page.
+- Pinned tabs keep their normal tab look with the background rotated for the side layout while the item icon stays upright.
+- Hover any normal creative tab to reveal a pin button in its corner.
+- Hover a pinned tab to reveal the crossed pin button used to unpin it.
+- Selecting a pinned tab does not change the creative tab page you are currently viewing.
+- Pins are stored globally on the client in `config/creativetabpinup.json`, so they persist across worlds and restarts.
+- No server installation is required.
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
+## Installation
 
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+1. Install NeoForge 21.1.226 or newer for Minecraft 1.21.1.
+2. Put the Creative Tab Pin-Up jar in the client's `mods` folder.
+3. Launch the game and open the creative inventory.
 
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+## Development
+
+Build with Java 21:
+
+```bash
+./gradlew build
+```
+
+The built jar is written to `build/libs`.
