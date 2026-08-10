@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="15" viewBox="0 0 30 15" shape-rendering="crispEdges">
+  <g id="pin">
+    <g fill="#1b1b1b">
+      <rect x="3" y="0" width="7" height="1"/>
+      <rect x="2" y="1" width="9" height="2"/>
+      <rect x="1" y="3" width="11" height="2"/>
+      <rect x="4" y="5" width="5" height="3"/>
+      <rect x="1" y="8" width="11" height="2"/>
+      <rect x="5" y="10" width="3" height="3"/>
+      <rect x="6" y="13" width="1" height="2"/>
+    </g>
+    <rect x="3" y="1" width="7" height="1" fill="#777777"/>
+    <rect x="2" y="3" width="9" height="1" fill="#d8d8d8"/>
+    <rect x="3" y="3" width="2" height="1" fill="#ffffff"/>
+    <rect x="5" y="5" width="3" height="3" fill="#d8d8d8"/>
+    <rect x="5" y="5" width="1" height="2" fill="#ffffff"/>
+    <rect x="2" y="8" width="9" height="1" fill="#d8d8d8"/>
+    <rect x="6" y="10" width="1" height="3" fill="#d8d8d8"/>
+  </g>
+  <g transform="translate(17 0)">
+    <use href="#pin"/>
+    <g fill="#ff4a4a">
+      <rect x="0" y="1" width="2" height="2"/>
+      <rect x="1" y="2" width="2" height="2"/>
+      <rect x="2" y="3" width="2" height="2"/>
+      <rect x="3" y="4" width="2" height="2"/>
+      <rect x="4" y="5" width="2" height="2"/>
+      <rect x="5" y="6" width="2" height="2"/>
+      <rect x="6" y="7" width="2" height="2"/>
+      <rect x="7" y="8" width="2" height="2"/>
+      <rect x="8" y="9" width="2" height="2"/>
+      <rect x="9" y="10" width="2" height="2"/>
+      <rect x="10" y="11" width="2" height="2"/>
+      <rect x="11" y="12" width="2" height="2"/>
+    </g>
+  </g>
+</svg>

@@ -19,7 +19,10 @@ public final class CreativeTabPinRenderer {
     private static final int SIDE_TAB_HEIGHT = 26;
     private static final int SIDE_TAB_VISIBLE_WIDTH = 28;
     private static final int SIDE_TAB_SPACING = 27;
-    private static final int PIN_SIZE = 8;
+    private static final int PIN_WIDTH = 13;
+    private static final int PIN_HEIGHT = 15;
+    private static final int NORMAL_PIN_GAP = 18;
+    private static final int SIDE_PIN_GAP = 10;
 
     private CreativeTabPinRenderer() {
     }
@@ -34,8 +37,8 @@ public final class CreativeTabPinRenderer {
 
         for (CreativeModeTab tab : screen.getCurrentPage().getVisibleTabs()) {
             Bounds body = normalTabBody(screen, tab);
-            if (body.contains(mouseX, mouseY)) {
-                Bounds pin = normalPinBounds(screen, tab);
+            Bounds pin = normalPinBounds(screen, tab);
+            if (body.contains(mouseX, mouseY) || pin.contains(mouseX, mouseY)) {
                 drawPinIcon(graphics, pin.x(), pin.y(), PinnedTabStore.isPinned(tab));
                 break;
             }
@@ -46,9 +49,11 @@ public final class CreativeTabPinRenderer {
         List<CreativeModeTab> pinnedTabs = PinnedTabStore.getPinnedTabs();
         for (int i = 0; i < pinnedTabs.size(); i++) {
             CreativeModeTab tab = pinnedTabs.get(i);
-            Bounds body = pinnedTabBody(screen, i);
-            if (body.contains(mouseX, mouseY)) {
-                return new ClickTarget(tab, pinnedPinBounds(screen, tab, i).contains(mouseX, mouseY));
+            if (pinnedPinBounds(screen, i).contains(mouseX, mouseY)) {
+                return new ClickTarget(tab, true);
+            }
+            if (pinnedTabBody(screen, i).contains(mouseX, mouseY)) {
+                return new ClickTarget(tab, false);
             }
         }
         return null;
@@ -56,9 +61,7 @@ public final class CreativeTabPinRenderer {
 
     public static CreativeModeTab findNormalPinTarget(CreativeModeInventoryScreen screen, double mouseX, double mouseY) {
         for (CreativeModeTab tab : screen.getCurrentPage().getVisibleTabs()) {
-            Bounds body = normalTabBody(screen, tab);
-            Bounds pin = normalPinBounds(screen, tab);
-            if (body.contains(mouseX, mouseY) && pin.contains(mouseX, mouseY)) {
+            if (normalPinBounds(screen, tab).contains(mouseX, mouseY)) {
                 return tab;
             }
         }
@@ -75,28 +78,54 @@ public final class CreativeTabPinRenderer {
     ) {
         boolean left = index < 4;
         Bounds body = pinnedTabBody(screen, index);
+        Bounds pin = pinnedPinBounds(screen, index);
         int drawX = left ? body.x() : body.x() - 4;
         int drawY = body.y();
 
         CreativeTabsScreenPage page = pageFor(screen, tab);
-        boolean top = page.isTop(tab);
-        boolean positiveRotation = positiveRotation(left, top);
+        boolean positiveRotation = positiveRotation(left, page.isTop(tab));
         boolean selected = CreativeModeInventoryScreenAccessor.creativetabpinup$getSelectedTab() == tab;
         ResourceLocation sprite = tabSprite(page, tab, selected);
 
         graphics.pose().pushPose();
         graphics.pose().translate(0.0F, 0.0F, 200.0F);
-        drawRotatedBackground(graphics, sprite, drawX, drawY, positiveRotation);
+        drawClippedRotatedBackground(screen, graphics, sprite, drawX, drawY, positiveRotation, left);
         ItemStack icon = tab.getIconItem();
         graphics.renderItem(icon, drawX + 8, drawY + 5);
         graphics.renderItemDecorations(Minecraft.getInstance().font, icon, drawX + 8, drawY + 5);
         graphics.pose().popPose();
 
-        if (body.contains(mouseX, mouseY)) {
-            Bounds pin = pinnedPinBounds(screen, tab, index);
+        boolean bodyHovered = body.contains(mouseX, mouseY);
+        if (bodyHovered || pin.contains(mouseX, mouseY)) {
             drawPinIcon(graphics, pin.x(), pin.y(), true);
+        }
+        if (bodyHovered) {
             graphics.renderTooltip(Minecraft.getInstance().font, tab.getDisplayName(), mouseX, mouseY);
         }
+    }
+
+    private static void drawClippedRotatedBackground(
+            CreativeModeInventoryScreen screen,
+            GuiGraphics graphics,
+            ResourceLocation sprite,
+            int x,
+            int y,
+            boolean positiveRotation,
+            boolean left
+    ) {
+        int panelLeft = screen.getGuiLeft();
+        int panelRight = panelLeft + screen.getXSize();
+        int screenWidth = Minecraft.getInstance().getWindow().getGuiScaledWidth();
+        int screenHeight = Minecraft.getInstance().getWindow().getGuiScaledHeight();
+
+        if (left) {
+            graphics.enableScissor(0, 0, panelLeft, screenHeight);
+        } else {
+            graphics.enableScissor(panelRight, 0, screenWidth, screenHeight);
+        }
+
+        drawRotatedBackground(graphics, sprite, x, y, positiveRotation);
+        graphics.disableScissor();
     }
 
     private static void drawRotatedBackground(
@@ -167,8 +196,11 @@ public final class CreativeTabPinRenderer {
 
     private static Bounds normalPinBounds(CreativeModeInventoryScreen screen, CreativeModeTab tab) {
         Bounds body = normalTabBody(screen, tab);
-        int y = screen.getCurrentPage().isTop(tab) ? body.y() + 6 : body.y() + 2;
-        return new Bounds(body.x() + 17, y, PIN_SIZE, PIN_SIZE);
+        int x = body.x() + (body.width() - PIN_WIDTH) / 2;
+        int y = screen.getCurrentPage().isTop(tab)
+                ? body.y() - NORMAL_PIN_GAP - PIN_HEIGHT
+                : body.y() + body.height() + NORMAL_PIN_GAP;
+        return new Bounds(x, y, PIN_WIDTH, PIN_HEIGHT);
     }
 
     private static Bounds pinnedTabBody(CreativeModeInventoryScreen screen, int index) {
@@ -182,37 +214,45 @@ public final class CreativeTabPinRenderer {
         return new Bounds(x, y, SIDE_TAB_VISIBLE_WIDTH, SIDE_TAB_HEIGHT);
     }
 
-    private static Bounds pinnedPinBounds(CreativeModeInventoryScreen screen, CreativeModeTab tab, int index) {
+    private static Bounds pinnedPinBounds(CreativeModeInventoryScreen screen, int index) {
         Bounds body = pinnedTabBody(screen, index);
-        boolean positiveRotation = positiveRotation(index < 4, pageFor(screen, tab).isTop(tab));
-        if (positiveRotation) {
-            return new Bounds(
-                    body.x() + body.width() - PIN_SIZE - 3,
-                    body.y() + body.height() - PIN_SIZE - 3,
-                    PIN_SIZE,
-                    PIN_SIZE
-            );
-        }
-        return new Bounds(body.x() + 3, body.y() + 3, PIN_SIZE, PIN_SIZE);
+        boolean left = index < 4;
+        int x = left
+                ? body.x() - SIDE_PIN_GAP - PIN_WIDTH
+                : body.x() + body.width() + SIDE_PIN_GAP;
+        int y = body.y() + (body.height() - PIN_HEIGHT) / 2;
+        return new Bounds(x, y, PIN_WIDTH, PIN_HEIGHT);
     }
 
     private static void drawPinIcon(GuiGraphics graphics, int x, int y, boolean crossed) {
         graphics.pose().pushPose();
         graphics.pose().translate(0.0F, 0.0F, 400.0F);
 
-        int outline = 0xFF202020;
-        int fill = 0xFFF0F0F0;
-        graphics.fill(x + 2, y + 1, x + 6, y + 2, outline);
-        graphics.fill(x + 1, y + 2, x + 7, y + 3, outline);
-        graphics.fill(x + 3, y + 3, x + 5, y + 6, outline);
-        graphics.fill(x + 2, y + 5, x + 6, y + 6, outline);
-        graphics.fill(x + 3, y + 6, x + 4, y + 8, outline);
-        graphics.fill(x + 3, y + 2, x + 5, y + 5, fill);
+        int outline = 0xFF1B1B1B;
+        int shadow = 0xFF777777;
+        int fill = 0xFFD8D8D8;
+        int highlight = 0xFFFFFFFF;
+
+        graphics.fill(x + 3, y, x + 10, y + 1, outline);
+        graphics.fill(x + 2, y + 1, x + 11, y + 3, outline);
+        graphics.fill(x + 1, y + 3, x + 12, y + 5, outline);
+        graphics.fill(x + 4, y + 5, x + 9, y + 8, outline);
+        graphics.fill(x + 1, y + 8, x + 12, y + 10, outline);
+        graphics.fill(x + 5, y + 10, x + 8, y + 13, outline);
+        graphics.fill(x + 6, y + 13, x + 7, y + 15, outline);
+
+        graphics.fill(x + 3, y + 1, x + 10, y + 2, shadow);
+        graphics.fill(x + 2, y + 3, x + 11, y + 4, fill);
+        graphics.fill(x + 3, y + 3, x + 5, y + 4, highlight);
+        graphics.fill(x + 5, y + 5, x + 8, y + 8, fill);
+        graphics.fill(x + 5, y + 5, x + 6, y + 7, highlight);
+        graphics.fill(x + 2, y + 8, x + 11, y + 9, fill);
+        graphics.fill(x + 6, y + 10, x + 7, y + 13, fill);
 
         if (crossed) {
-            int cross = 0xFFFF5555;
-            for (int i = 0; i < 7; i++) {
-                graphics.fill(x + i, y + i, x + i + 2, y + i + 2, cross);
+            int cross = 0xFFFF4A4A;
+            for (int i = 0; i < 12; i++) {
+                graphics.fill(x + i, y + i + 1, x + i + 2, y + i + 3, cross);
             }
         }
 
