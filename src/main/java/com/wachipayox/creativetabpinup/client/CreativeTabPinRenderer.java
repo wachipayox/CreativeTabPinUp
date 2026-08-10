@@ -10,6 +10,7 @@ import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.gui.CreativeTabsScreenPage;
 import net.neoforged.neoforge.common.CreativeModeTabRegistry;
@@ -21,8 +22,8 @@ public final class CreativeTabPinRenderer {
     private static final int SIDE_TAB_SPACING = 27;
     private static final int PIN_WIDTH = 13;
     private static final int PIN_HEIGHT = 15;
-    private static final int NORMAL_PIN_GAP = 18;
-    private static final int SIDE_PIN_GAP = 10;
+    private static final int NORMAL_PIN_GAP = -3;
+    private static final int SIDE_PIN_GAP = 2;
 
     private CreativeTabPinRenderer() {
     }
@@ -36,6 +37,8 @@ public final class CreativeTabPinRenderer {
         }
 
         for (CreativeModeTab tab : screen.getCurrentPage().getVisibleTabs()) {
+            if(tab.equals(CreativeModeTabs.searchTab())) continue;
+
             Bounds body = normalTabBody(screen, tab);
             Bounds pin = normalPinBounds(screen, tab);
             if (body.contains(mouseX, mouseY) || pin.contains(mouseX, mouseY)) {
@@ -61,6 +64,7 @@ public final class CreativeTabPinRenderer {
 
     public static CreativeModeTab findNormalPinTarget(CreativeModeInventoryScreen screen, double mouseX, double mouseY) {
         for (CreativeModeTab tab : screen.getCurrentPage().getVisibleTabs()) {
+            if(tab.equals(CreativeModeTabs.searchTab())) continue;
             if (normalPinBounds(screen, tab).contains(mouseX, mouseY)) {
                 return tab;
             }
@@ -83,13 +87,12 @@ public final class CreativeTabPinRenderer {
         int drawY = body.y();
 
         CreativeTabsScreenPage page = pageFor(screen, tab);
-        boolean positiveRotation = positiveRotation(left, page.isTop(tab));
         boolean selected = CreativeModeInventoryScreenAccessor.creativetabpinup$getSelectedTab() == tab;
         ResourceLocation sprite = tabSprite(page, tab, selected);
 
         graphics.pose().pushPose();
         graphics.pose().translate(0.0F, 0.0F, 200.0F);
-        drawClippedRotatedBackground(screen, graphics, sprite, drawX, drawY, positiveRotation, left);
+        drawClippedRotatedBackground(screen, graphics, sprite, drawX, drawY, left);
         ItemStack icon = tab.getIconItem();
         graphics.renderItem(icon, drawX + 8, drawY + 5);
         graphics.renderItemDecorations(Minecraft.getInstance().font, icon, drawX + 8, drawY + 5);
@@ -110,7 +113,6 @@ public final class CreativeTabPinRenderer {
             ResourceLocation sprite,
             int x,
             int y,
-            boolean positiveRotation,
             boolean left
     ) {
         int panelLeft = screen.getGuiLeft();
@@ -124,7 +126,7 @@ public final class CreativeTabPinRenderer {
             graphics.enableScissor(panelRight, 0, screenWidth, screenHeight);
         }
 
-        drawRotatedBackground(graphics, sprite, x, y, positiveRotation);
+        drawRotatedBackground(graphics, sprite, x, y, !left);
         graphics.disableScissor();
     }
 
@@ -147,16 +149,15 @@ public final class CreativeTabPinRenderer {
         graphics.pose().popPose();
     }
 
-    private static boolean positiveRotation(boolean left, boolean top) {
-        return left != top;
+    private static boolean positiveRotation(boolean left) {
+        return left;
     }
 
     private static ResourceLocation tabSprite(CreativeTabsScreenPage page, CreativeModeTab tab, boolean selected) {
-        String row = page.isTop(tab) ? "top" : "bottom";
         String state = selected ? "selected" : "unselected";
         int column = Mth.clamp(page.getColumn(tab), 0, 6) + 1;
         return ResourceLocation.withDefaultNamespace(
-                "container/creative_inventory/tab_" + row + "_" + state + "_" + column
+                "container/creative_inventory/tab_top_" + state + "_" + column
         );
     }
 
@@ -184,22 +185,40 @@ public final class CreativeTabPinRenderer {
 
     private static Bounds normalTabBody(CreativeModeInventoryScreen screen, CreativeModeTab tab) {
         CreativeTabsScreenPage page = screen.getCurrentPage();
+
         int column = page.getColumn(tab);
         int x = 27 * column;
+
         if (tab.isAlignedRight()) {
             x = screen.getXSize() - 27 * (7 - column) + 1;
         }
 
         int y = page.isTop(tab) ? -32 : screen.getYSize();
+
         return new Bounds(screen.getGuiLeft() + x, screen.getGuiTop() + y, 26, 32);
     }
 
     private static Bounds normalPinBounds(CreativeModeInventoryScreen screen, CreativeModeTab tab) {
         Bounds body = normalTabBody(screen, tab);
+
+        CreativeTabsScreenPage page = screen.getCurrentPage();
+
+        boolean top = page.isTop(tab);
+        boolean supertop = !tab.isAlignedRight()
+                && top
+                && !page.getVisibleTabs().isEmpty()
+                && page.getVisibleTabs().getFirst() == tab;
+
         int x = body.x() + (body.width() - PIN_WIDTH) / 2;
         int y = screen.getCurrentPage().isTop(tab)
                 ? body.y() - NORMAL_PIN_GAP - PIN_HEIGHT
                 : body.y() + body.height() + NORMAL_PIN_GAP;
+
+        if(supertop){
+            x -= 22;
+            y += 27;
+        }
+
         return new Bounds(x, y, PIN_WIDTH, PIN_HEIGHT);
     }
 
