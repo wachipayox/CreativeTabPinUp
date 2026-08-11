@@ -8,6 +8,8 @@ modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 displayURL="https://github.com/wachipayox/CreativeTabPinUp"
+logoFile="icon.png"
+authors="Wachipayoxx"
 description='''
 Pin creative inventory tabs as persistent client-side shortcuts without changing normal creative tab ordering or pagination.
 '''

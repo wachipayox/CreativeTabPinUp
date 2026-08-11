@@ -116,7 +116,7 @@ public final class CreativeTabPinRenderer {
         graphics.pose().translate(0.0F, 0.0F, 200.0F);
         drawClippedRotatedBackground(screen, graphics, sprite, drawX, drawY, left);
         ItemStack icon = tab.getIconItem();
-        graphics.renderItem(icon, drawX + 8, drawY + 5);
+        graphics.renderItem(icon, drawX + (left && !selected ? 9 : (!selected ? 7 : 8)), drawY + 5);
         graphics.renderItemDecorations(Minecraft.getInstance().font, icon, drawX + 8, drawY + 5);
         graphics.pose().popPose();
 
@@ -164,7 +164,7 @@ public final class CreativeTabPinRenderer {
             graphics.pose().translate(x + SIDE_TAB_WIDTH, y, 0.0F);
             graphics.pose().mulPose(Axis.ZP.rotationDegrees(90.0F));
         } else {
-            graphics.pose().translate(x + 30, y, 0.0F);
+            graphics.pose().translate(x + 31, y, 0.0F);
             graphics.pose().mulPose(Axis.ZP.rotationDegrees(90.0F));
         }
         graphics.blitSprite(sprite, 0, 0, 26, 32);
