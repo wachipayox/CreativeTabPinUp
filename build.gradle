@@ -13,14 +13,35 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
 repositories {
     maven {
         url = 'https://maven.blamejared.com'
+    }
+    maven {
+        url = 'https://maven.createmod.net'
+    }
+    maven {
+        url = 'https://maven.ithundxr.dev/snapshots'
+    }
+    maven {
+        url = 'https://jitpack.io'
+        content {
+            includeGroup 'com.github.wachipayox'
+        }
     }
 }
 
 dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
+
+    compileOnly("com.github.wachipayox:FilterStamp:${filter_stamp_commit}") {
+        transitive = false
+    }
+    localRuntime "com.github.wachipayox:FilterStamp:${filter_stamp_commit}"
 }
 
 neoForge {

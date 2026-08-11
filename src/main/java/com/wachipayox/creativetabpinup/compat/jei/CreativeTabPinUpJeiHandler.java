@@ -25,7 +25,7 @@ public final class CreativeTabPinUpJeiHandler<T extends AbstractContainerMenu>
 
         if (screen instanceof CreativeModeInventoryScreen creativeScreen) {
             areas.addAll(CreativeTabPinRenderer.getRightPinnedTabExclusionAreas(creativeScreen));
-            rightSideOffset = CreativeTabPinRenderer.getRightSideReservedWidth();
+            rightSideOffset = CreativeTabPinRenderer.getRightSideReservedWidth(creativeScreen);
         }
 
         addEffectAreas(screen, areas, rightSideOffset);

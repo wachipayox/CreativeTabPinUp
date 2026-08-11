@@ -12,7 +12,12 @@ Creative Tab Pin-Up is a client-side NeoForge mod for Minecraft 1.21.1 that lets
 - Hover a pinned tab to reveal the crossed pin button used to unpin it.
 - Selecting a pinned tab does not change the creative tab page you are currently viewing.
 - Pins are stored globally on the client in `config/creativetabpinup.json`, so they persist across worlds and restarts.
+- JEI and Filter Stamp integrations are optional and only activate when those mods are present.
 - No server installation is required.
+
+## Filter Stamp compatibility
+
+When Filter Stamp is installed, pinned tabs avoid its compact creative-inventory drawer dynamically. Only pinned tabs whose rows intersect the visible stamp drawer move out of the way, using closed detached-tab sprites. Opening Filter Stamp's large selector hides the pinned shortcuts until the selector is closed. Fully hiding Filter Stamp restores the normal pinned-tab layout.
 
 ## Installation
 
@@ -27,5 +32,7 @@ Build with Java 21:
 ```bash
 ./gradlew build
 ```
+
+The development runtime includes the pinned Filter Stamp revision used by the compatibility layer. The built Creative Tab Pin-Up jar does not bundle Filter Stamp.
 
 The built jar is written to `build/libs`.

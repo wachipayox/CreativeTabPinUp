@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.4
+
+- Added optional Filter Stamp compatibility without making Filter Stamp a runtime requirement.
+- Added Filter Stamp to the development runtime at the compatibility-tested repository revision.
+- Dynamically move only pinned tabs that overlap Filter Stamp's compact drawer out of its way.
+- Added detached closed-tab sprites for shifted pinned tabs, including a selected state based on the provided assets.
+- Hide lateral pinned shortcuts while Filter Stamp's large selector is open and restore the normal layout when Filter Stamp is fully hidden.
+- Disable right-side JEI/effect spacing for pinned shortcuts while Filter Stamp's large selector has those shortcuts hidden.
+
+## 1.0.3
+
+- Updated the mod icon and author metadata.
+- Refined left pinned-tab positioning.
+- Added subtle item-icon positioning differences for selected and unselected pinned tabs.
+
 ## 1.0.2
 
 - Moved creative inventory effects 43 pixels to the right whenever at least one pinned tab is present on the right side.

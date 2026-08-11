@@ -26,8 +26,8 @@ public final class CreativeTabPinEvents {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onRenderInventoryMobEffects(ScreenEvent.RenderInventoryMobEffects event) {
-        if (event.getScreen() instanceof CreativeModeInventoryScreen) {
-            event.addHorizontalOffset(CreativeTabPinRenderer.getRightSideReservedWidth());
+        if (event.getScreen() instanceof CreativeModeInventoryScreen screen) {
+            event.addHorizontalOffset(CreativeTabPinRenderer.getRightSideReservedWidth(screen));
         }
     }
 
