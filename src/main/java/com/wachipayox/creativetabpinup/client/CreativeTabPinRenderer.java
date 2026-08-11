@@ -164,8 +164,8 @@ public final class CreativeTabPinRenderer {
             graphics.pose().translate(x + SIDE_TAB_WIDTH, y, 0.0F);
             graphics.pose().mulPose(Axis.ZP.rotationDegrees(90.0F));
         } else {
-            graphics.pose().translate(x, y + SIDE_TAB_HEIGHT, 0.0F);
-            graphics.pose().mulPose(Axis.ZP.rotationDegrees(-90.0F));
+            graphics.pose().translate(x + 30, y, 0.0F);
+            graphics.pose().mulPose(Axis.ZP.rotationDegrees(90.0F));
         }
         graphics.blitSprite(sprite, 0, 0, 26, 32);
         graphics.pose().popPose();
@@ -174,8 +174,12 @@ public final class CreativeTabPinRenderer {
     private static ResourceLocation tabSprite(CreativeTabsScreenPage page, CreativeModeTab tab, boolean selected) {
         String state = selected ? "selected" : "unselected";
         int column = Mth.clamp(page.getColumn(tab), 0, 6) + 1;
+
+        boolean a = PinnedTabStore.getPinnedTabs().contains(tab)
+                && PinnedTabStore.getPinnedTabs().indexOf(tab) > 3;
+
         return ResourceLocation.withDefaultNamespace(
-                "container/creative_inventory/tab_top_" + state + "_" + column
+                "container/creative_inventory/tab_" + (a ? "top" : "bottom") + "_" + state + "_" + column
         );
     }
 
