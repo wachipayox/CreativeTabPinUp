@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ScreenEvent;
@@ -20,6 +21,13 @@ public final class CreativeTabPinEvents {
     public static void onRender(ScreenEvent.Render.Post event) {
         if (event.getScreen() instanceof CreativeModeInventoryScreen screen) {
             CreativeTabPinRenderer.render(screen, event.getGuiGraphics(), event.getMouseX(), event.getMouseY());
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onRenderInventoryMobEffects(ScreenEvent.RenderInventoryMobEffects event) {
+        if (event.getScreen() instanceof CreativeModeInventoryScreen) {
+            event.addHorizontalOffset(CreativeTabPinRenderer.getRightSideReservedWidth());
         }
     }
 

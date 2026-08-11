@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.2
+
+- Moved creative inventory effects 43 pixels to the right whenever at least one pinned tab is present on the right side.
+- Added optional JEI integration through its GUI exclusion API.
+- Reserved one precise 43x26 JEI exclusion area for each visible right-side pinned tab instead of reserving a full fixed column.
+- Replaced JEI's built-in effect exclusion handler on supported JEI versions so the reserved effect area follows the shifted effect renderer.
+- Preserved normal JEI effect exclusions on other inventory screens.
+
 ## 1.0.1
 
 - Clipped pinned tab backgrounds at the creative window edge so they no longer render over the main inventory panel.
