@@ -13,7 +13,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.wachipayox.creativetabpinup.client.registry.SoundRegistry;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.CreativeModeTabRegistry;
@@ -30,22 +36,16 @@ public final class PinnedTabStore {
     }
 
     public static void load() {
-        if (loaded) {
-            return;
-        }
-
+        if (loaded) return;
         loaded = true;
+
         Path file = configFile();
-        if (!Files.exists(file)) {
-            return;
-        }
+        if (!Files.exists(file)) return;
 
         try {
             JsonObject root = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
             JsonArray tabs = root.getAsJsonArray("pinnedTabs");
-            if (tabs == null) {
-                return;
-            }
+            if (tabs == null) return;
 
             for (JsonElement element : tabs) {
                 ResourceLocation id = ResourceLocation.tryParse(element.getAsString());
@@ -58,16 +58,14 @@ public final class PinnedTabStore {
         }
     }
 
-    public static void cleanupInvalidTabs() {
+    public static void cleanInvalidTabs() {
         ensureLoaded();
-        if (cleaned) {
-            return;
-        }
 
+        if (cleaned) return;
         cleaned = true;
-        if (PINNED_TABS.removeIf(id -> CreativeModeTabRegistry.getTab(id) == null)) {
+
+        if (PINNED_TABS.removeIf(id -> CreativeModeTabRegistry.getTab(id) == null))
             save();
-        }
     }
 
     public static List<CreativeModeTab> getPinnedTabs() {
@@ -87,36 +85,37 @@ public final class PinnedTabStore {
     public static boolean toggle(CreativeModeTab tab) {
         ensureLoaded();
         ResourceLocation id = CreativeModeTabRegistry.getName(tab);
-        if (id == null) {
-            return true;
-        }
+        if (id == null) return true;
 
         if (PINNED_TABS.remove(id)) {
             save();
+            if(Minecraft.getInstance().player instanceof LocalPlayer player)
+                player.playSound(SoundRegistry.UNPIN.get());
             return true;
         }
 
-        if (PINNED_TABS.size() >= MAX_PINNED_TABS) {
-            return false;
-        }
+        if (PINNED_TABS.size() >= MAX_PINNED_TABS) return false;
 
         PINNED_TABS.add(id);
         save();
+
+        if(Minecraft.getInstance().player instanceof LocalPlayer player)
+            player.playSound(SoundRegistry.PIN.get());
+
         return true;
     }
 
     public static void unpin(CreativeModeTab tab) {
         ensureLoaded();
         ResourceLocation id = CreativeModeTabRegistry.getName(tab);
-        if (id != null && PINNED_TABS.remove(id)) {
-            save();
-        }
+        if (id != null && PINNED_TABS.remove(id)) save();
+
+        if(Minecraft.getInstance().player instanceof LocalPlayer player)
+            Minecraft.getInstance().player.playSound(SoundRegistry.UNPIN.get());
     }
 
     private static void ensureLoaded() {
-        if (!loaded) {
-            load();
-        }
+        if (!loaded) load();
     }
 
     private static void save() {

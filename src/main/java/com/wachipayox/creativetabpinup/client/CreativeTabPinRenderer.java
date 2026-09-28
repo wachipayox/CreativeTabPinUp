@@ -36,14 +36,18 @@ public final class CreativeTabPinRenderer {
     private static final ResourceLocation DETACHED_TAB_SELECTED_SPRITE =
             ResourceLocation.fromNamespaceAndPath(CreativeTabPinUp.MOD_ID, "creative_inventory/detached_tab_selected");
 
+    private static final ResourceLocation PIN =
+            ResourceLocation.fromNamespaceAndPath(CreativeTabPinUp.MOD_ID, "creative_inventory/pin");
+    private static final ResourceLocation PIN_X =
+            PIN.withSuffix("_x");
+
     private CreativeTabPinRenderer() {
     }
 
     public static int getRightPinnedTabCount(CreativeModeInventoryScreen screen) {
-        FilterStampCompat.Layout filterStampLayout = FilterStampCompat.getLayout(screen);
-        if (filterStampLayout.hidesPinnedTabs()) {
+        if (FilterStampCompat.getLayout(screen).hidesPinnedTabs())
             return 0;
-        }
+
         return Mth.clamp(PinnedTabStore.getPinnedTabs().size() - 4, 0, 4);
     }
 
@@ -69,9 +73,9 @@ public final class CreativeTabPinRenderer {
     }
 
     public static void render(CreativeModeInventoryScreen screen, GuiGraphics graphics, int mouseX, int mouseY) {
-        PinnedTabStore.cleanupInvalidTabs();
+        PinnedTabStore.cleanInvalidTabs();
 
-        FilterStampCompat.Layout filterStampLayout = FilterStampCompat.getLayout(screen);
+        var filterStampLayout = FilterStampCompat.getLayout(screen);
         if (!filterStampLayout.hidesPinnedTabs()) {
             List<CreativeModeTab> pinnedTabs = PinnedTabStore.getPinnedTabs();
             for (int i = 0; i < pinnedTabs.size(); i++) {
@@ -344,33 +348,7 @@ public final class CreativeTabPinRenderer {
         graphics.pose().pushPose();
         graphics.pose().translate(0.0F, 0.0F, 400.0F);
 
-        int outline = 0xFF1B1B1B;
-        int shadow = 0xFF777777;
-        int fill = 0xFFD8D8D8;
-        int highlight = 0xFFFFFFFF;
-
-        graphics.fill(x + 3, y, x + 10, y + 1, outline);
-        graphics.fill(x + 2, y + 1, x + 11, y + 3, outline);
-        graphics.fill(x + 1, y + 3, x + 12, y + 5, outline);
-        graphics.fill(x + 4, y + 5, x + 9, y + 8, outline);
-        graphics.fill(x + 1, y + 8, x + 12, y + 10, outline);
-        graphics.fill(x + 5, y + 10, x + 8, y + 13, outline);
-        graphics.fill(x + 6, y + 13, x + 7, y + 15, outline);
-
-        graphics.fill(x + 3, y + 1, x + 10, y + 2, shadow);
-        graphics.fill(x + 2, y + 3, x + 11, y + 4, fill);
-        graphics.fill(x + 3, y + 3, x + 5, y + 4, highlight);
-        graphics.fill(x + 5, y + 5, x + 8, y + 8, fill);
-        graphics.fill(x + 5, y + 5, x + 6, y + 7, highlight);
-        graphics.fill(x + 2, y + 8, x + 11, y + 9, fill);
-        graphics.fill(x + 6, y + 10, x + 7, y + 13, fill);
-
-        if (crossed) {
-            int cross = 0xFFFF4A4A;
-            for (int i = 0; i < 12; i++) {
-                graphics.fill(x + i, y + i + 1, x + i + 2, y + i + 3, cross);
-            }
-        }
+        graphics.blitSprite(crossed ? PIN_X : PIN, x, y, 15, 15);
 
         graphics.pose().popPose();
     }

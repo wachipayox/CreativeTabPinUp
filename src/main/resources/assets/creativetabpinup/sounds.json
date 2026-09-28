@@ -1,0 +1,22 @@
+{
+  "pin": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "creativetabpinup:pin",
+        "pitch": 1.4,
+        "volume": 0.5
+      }
+    ]
+  },
+  "unpin": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "creativetabpinup:pin",
+        "pitch": 1,
+        "volume": 0.5
+      }
+    ]
+  }
+}
